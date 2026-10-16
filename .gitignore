@@ -81,3 +81,6 @@ test/tmp/
 *.rej
 
 graphify-out
+prompt.md
+AGENTS.md
+CLAUDE.md

@@ -1,0 +1,131 @@
+name: Bug report
+description: Report something that isn't working as expected
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much as you can —
+        a good report is the fastest way to a fix.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      description: Please tick these before submitting.
+      options:
+        - label: I have searched the existing issues and this is not a duplicate.
+          required: true
+        - label: I am running a current version of plug.zsh (`plug selfupdate`).
+          required: true
+        - label: I ran `plug doctor` and pasted its output below.
+          required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what went wrong.
+      placeholder: When I run `plug ...`, the prompt hangs / the plugin does not load / ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: The exact `plug` commands, ideally the smallest set that reproduces it.
+      placeholder: |
+        1. plug install user/repo
+        2. plug lazy user/repo mycmd
+        3. exec zsh
+        4. run `mycmd`
+      render: zsh
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What actually happened, including the full terminal output.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`plug doctor` output"
+      description: Paste the output of `plug doctor` (it checks the most common problems for you).
+      render: text
+      placeholder: |
+        plug doctor
+        ...
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: plug.zsh version
+      description: Output of `plug --version`.
+      placeholder: "plug 1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: zsh-version
+    attributes:
+      label: zsh version
+      description: Output of `echo $ZSH_VERSION`.
+      placeholder: "5.9.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - WSL
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: input
+    id: git-gum
+    attributes:
+      label: git and gum versions
+      description: Output of `git --version` and `gum --version`.
+      placeholder: "git 2.55.0, gum 2.0.0"
+    validations:
+      required: false
+
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal
+      description: Which terminal emulator are you using?
+      placeholder: "Ghostty, Kitty, Alacritty, iTerm2, ..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that might help (relevant `.zshrc` lines, whether it works in a fresh shell, ...).
+    validations:
+      required: false

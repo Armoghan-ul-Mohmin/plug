@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install gum (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://repo.charm.sh/apt/gpg.key \
+            | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" \
+            | sudo tee /etc/apt/sources.list.d/charm.list
+          sudo apt-get update
+          sudo apt-get install -y gum
+
+      - name: Install gum (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gum
+
+      - name: Show versions
+        run: |
+          zsh --version
+          git --version
+          gum --version
+
+      - name: Syntax check
+        run: |
+          set -e
+          for f in plug.zsh lib/*.zsh test/run-tests.zsh test/lib/*.zsh test/cases/*.zsh; do
+            echo "zsh -n $f"
+            zsh -n "$f"
+          done
+
+      - name: Run test suite
+        run: zsh test/run-tests.zsh

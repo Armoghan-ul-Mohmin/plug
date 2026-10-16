@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the manual
+    url: https://github.com/Armoghan-ul-Mohmin/plug/blob/main/PLUG.md
+    about: The complete reference for every command, setting, and internal.
+  - name: FAQ
+    url: https://github.com/Armoghan-ul-Mohmin/plug/blob/main/docs/faq.md
+    about: Frequently asked questions — your answer may already be here.
+  - name: Troubleshooting guide
+    url: https://github.com/Armoghan-ul-Mohmin/plug/blob/main/docs/troubleshooting.md
+    about: Symptoms, causes, and fixes for common problems.
+  - name: Report a security issue
+    url: https://github.com/Armoghan-ul-Mohmin/plug/security/advisories/new
+    about: Please report vulnerabilities privately — see SECURITY.md.
+  - name: Ask a question (Discussions)
+    url: https://github.com/Armoghan-ul-Mohmin/plug/discussions
+    about: For open-ended questions and ideas, use GitHub Discussions.

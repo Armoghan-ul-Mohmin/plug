@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify the tag matches PLUG_VERSION
+        run: |
+          set -e
+          tag="${GITHUB_REF_NAME#v}"
+          src="$(grep -m1 'PLUG_VERSION=' plug.zsh | sed -E 's/.*"([^"]+)".*/\1/')"
+          echo "tag=$tag  PLUG_VERSION=$src"
+          if [ "$tag" != "$src" ]; then
+            echo "::error::tag v$tag does not match PLUG_VERSION=$src in plug.zsh"
+            exit 1
+          fi
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

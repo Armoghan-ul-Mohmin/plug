@@ -1,0 +1,38 @@
+name: Documentation
+description: Report a documentation problem or suggest an improvement
+title: "[docs] "
+labels: ["documentation", "needs-triage"]
+body:
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I have searched the existing issues and this is not a duplicate.
+          required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Where is the problem?
+      description: Link to or name the file and section.
+      placeholder: "README.md → Quick start, or docs/commands.md → plug sync"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing?
+      description: Typos, outdated commands, unclear wording, missing examples, ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: If you have one, show what it should say.
+      render: markdown
+    validations:
+      required: false

@@ -1,0 +1,70 @@
+name: Feature request
+description: Suggest an idea or improvement for plug.zsh
+title: "[feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make plug.zsh better! Describe the idea and, if you can, the
+        use case behind it — that context is what makes a feature request easy to act on.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I have searched the existing issues and this has not been requested already.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of the problem or friction.
+      placeholder: I'm always frustrated when ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: What should plug.zsh do? Include the exact command you would run, if you can.
+      placeholder: |
+        plug mycommand arg
+      render: zsh
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Other approaches, or how other plugin managers handle this.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of plug.zsh does this touch?
+      options:
+        - Commands / CLI
+        - Loading (lazy, defer, startup cache)
+        - Updates / lock / sync
+        - Configuration
+        - UI / Gum interface
+        - Documentation
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links, examples, screenshots, or anything else.
+    validations:
+      required: false

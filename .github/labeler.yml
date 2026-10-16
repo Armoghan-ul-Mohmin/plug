@@ -1,0 +1,43 @@
+# Labels applied by .github/workflows/labeler.yml (actions/labeler v5 syntax).
+
+core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'plug.zsh'
+          - 'lib/**'
+
+loading:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'lib/30-cache.zsh'
+
+commands:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'lib/40-plugins.zsh'
+          - 'lib/45-tools.zsh'
+          - 'lib/50-update.zsh'
+          - 'lib/60-inspect.zsh'
+          - 'lib/90-ui.zsh'
+
+git:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'lib/20-git.zsh'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'test/**'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - 'docs/**'
+          - 'LICENSE'

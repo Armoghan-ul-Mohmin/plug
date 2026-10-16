@@ -1,0 +1,75 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint (workflows)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download actionlint
+        run: |
+          bash <(curl --proto '=https' --tlsv1.2 -sSf \
+            https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          echo "$PWD" >> "$GITHUB_PATH"
+
+      - name: Run actionlint
+        run: actionlint -color
+
+  shell:
+    name: zsh syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check every zsh file parses
+        run: |
+          set -e
+          shopt -s globstar nullglob
+          for f in plug.zsh lib/*.zsh test/**/*.zsh; do
+            printf 'zsh -n %s\n' "$f"
+            zsh -n "$f"
+          done
+
+  yaml:
+    name: YAML sanity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse every YAML file
+        run: |
+          python3 - <<'PY'
+          import glob, sys, yaml
+          files = sorted(
+              glob.glob('.github/**/*.yml', recursive=True)
+              + glob.glob('.specify/**/*.yml', recursive=True)
+          )
+          bad = 0
+          for f in files:
+              try:
+                  with open(f) as fh:
+                      yaml.safe_load(fh)
+                  print(f"ok   {f}")
+              except Exception as e:
+                  print(f"FAIL {f}: {e}")
+                  bad = 1
+          sys.exit(bad)
+          PY

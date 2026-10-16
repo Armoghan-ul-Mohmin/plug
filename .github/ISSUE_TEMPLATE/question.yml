@@ -1,0 +1,68 @@
+name: Question / support
+description: Ask a question about using plug.zsh
+title: "[question] "
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help? Before opening an issue, please skim the
+        [README](https://github.com/Armoghan-ul-Mohmin/plug/blob/main/README.md),
+        the [manual](https://github.com/Armoghan-ul-Mohmin/plug/blob/main/PLUG.md),
+        and the [FAQ](https://github.com/Armoghan-ul-Mohmin/plug/blob/main/docs/faq.md).
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      description: Describe your goal, not just the command.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: Include the `plug` commands you ran and their output.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: plug.zsh version
+      description: Output of `plug --version`.
+      placeholder: "plug 1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: zsh-version
+    attributes:
+      label: zsh version
+      description: Output of `echo $ZSH_VERSION`.
+      placeholder: "5.9.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - WSL
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`plug doctor` output"
+      description: If your question is about something not working, paste `plug doctor`.
+      render: text
+    validations:
+      required: false

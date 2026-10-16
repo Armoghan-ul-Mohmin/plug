@@ -57,38 +57,102 @@ typeset -g PLUG_LOADED_SELF="$PLUG_SELF"
 : ${PLUG_DIR:="$HOME/.local/share/zsh"}
 typeset -g PLUG_DIR
 
-: ${PLUG_JOBS:=4}
-: ${PLUG_COMPINIT:=1}
+: ${PLUG_PLUGIN_DIR:="$PLUG_DIR/plugins"}
+: ${PLUG_PLUGIN_FILE:="$PLUG_DIR/plugins.txt"}
+: ${PLUG_DISABLED_FILE:="$PLUG_DIR/disabled.txt"}
+: ${PLUG_LAZY_FILE:="$PLUG_DIR/lazy.txt"}
+: ${PLUG_DEFER_FILE:="$PLUG_DIR/deferred.txt"}
+: ${PLUG_BRANCH_FILE:="$PLUG_DIR/branches.txt"}
+: ${PLUG_EVAL_FILE:="$PLUG_DIR/evals.txt"}
+: ${PLUG_EVAL_DIR:="$PLUG_DIR/evals"}
+: ${PLUG_COMP_DIR:="$PLUG_DIR/completions"}
+: ${PLUG_LOCK_FILE:="$PLUG_DIR/lock"}
+: ${PLUG_CACHE_FILE:="$PLUG_DIR/cache.zsh"}
+: ${PLUG_LOG_FILE:="$PLUG_DIR/plug.log"}
+: ${PLUG_OMZ_DIR:="$PLUG_DIR/omz"}
+typeset -g PLUG_PLUGIN_DIR PLUG_PLUGIN_FILE PLUG_DISABLED_FILE PLUG_LAZY_FILE
+typeset -g PLUG_DEFER_FILE PLUG_BRANCH_FILE PLUG_EVAL_FILE PLUG_EVAL_DIR
+typeset -g PLUG_COMP_DIR PLUG_LOCK_FILE PLUG_CACHE_FILE PLUG_LOG_FILE PLUG_OMZ_DIR
+
+: ${PLUG_CACHE_DIR:="$HOME/.cache/zsh/plug"}
+: ${PLUG_GIT_BASE:="https://github.com"}
+: ${PLUG_OMZ_URL:="https://github.com/ohmyzsh/ohmyzsh.git"}
+: ${PLUG_OMZ_CACHE_DIR:="$PLUG_CACHE_DIR/omz"}
 : ${PLUG_OMZ_LIB:="functions git clipboard"}
+typeset -g PLUG_CACHE_DIR PLUG_GIT_BASE PLUG_OMZ_URL PLUG_OMZ_CACHE_DIR PLUG_OMZ_LIB
+
+: ${PLUG_COMPINIT:=${PLUG_OMZ_COMPINIT:-1}}
+: ${PLUG_JOBS:=4}
 : ${PLUG_MAX_LOG_SIZE:=1048576}
-: ${PLUG_NO_AUTOLOAD:=}
+: ${PLUG_PROFILE:=0}
+typeset -gi PLUG_COMPINIT PLUG_JOBS PLUG_MAX_LOG_SIZE PLUG_PROFILE
 
-typeset -g PLUG_PLUGIN_DIR="$PLUG_DIR/plugins"
-typeset -g PLUG_PLUGIN_FILE="$PLUG_DIR/plugins.txt"
-typeset -g PLUG_DISABLED_FILE="$PLUG_DIR/disabled.txt"
-typeset -g PLUG_LAZY_FILE="$PLUG_DIR/lazy.txt"
-typeset -g PLUG_DEFER_FILE="$PLUG_DIR/deferred.txt"
-typeset -g PLUG_BRANCH_FILE="$PLUG_DIR/branches.txt"
-typeset -g PLUG_EVAL_FILE="$PLUG_DIR/evals.txt"
-typeset -g PLUG_EVAL_DIR="$PLUG_DIR/evals"
-typeset -g PLUG_COMP_DIR="$PLUG_DIR/completions"
-typeset -g PLUG_LOCK_FILE="$PLUG_DIR/lock"
-typeset -g PLUG_CACHE_FILE="$PLUG_DIR/cache.zsh"
-typeset -g PLUG_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/plug"
+typeset -ga PLUG_BROWSE_ITEMS=(
+    'zsh-users/zsh-autosuggestions|fish-like suggestions for zsh'
+    'zsh-users/zsh-syntax-highlighting|syntax highlighting for commands'
+    'zsh-users/zsh-completions|additional zsh completions'
+    'Aloxaf/fzf-tab|replace zsh completion menu with fzf'
+    'zdharma-continuum/fast-syntax-highlighting|fast syntax highlighting'
+    'MichaelAquilina/zsh-you-should-use|reminds you of existing aliases'
+    'marlonrichert/zsh-autocomplete|real-time type-ahead completion'
+    'romkatv/powerlevel10k|fast and highly customizable prompt'
+    'zsh-users/zsh-history-substring-search|search history by substring'
+    'chisui/zsh-nix-shell|nix-shell integration for zsh'
+)
 
-emulate -L zsh
-setopt extended_glob
 
-# Source modules in numeric order.
-local f
-for f in "$PLUG_ROOT"/lib/*.zsh(N); do
-    source "$f"
-done
+# =============================================================================
+# State
+# =============================================================================
 
-# Fast path: source generated cache if it exists and is newer than plugins.
-if [[ -r $PLUG_CACHE_FILE && $PLUG_CACHE_FILE -nt $PLUG_PLUGIN_FILE ]]; then
-    source "$PLUG_CACHE_FILE"
+typeset -ga PLUG_PLUGINS=()                 # registry, in load order
+typeset -gA PLUG_DISABLED=()                # name -> 1
+typeset -gA PLUG_LAZY=()                    # name -> "cmd cmd ..."
+typeset -gA PLUG_DEFER=()                   # name -> milliseconds after prompt
+typeset -gA PLUG_BRANCH=()                  # name -> pinned branch
+typeset -gA PLUG_LOADED=()                  # name -> 1 (this shell)
+typeset -gA PLUG_LOCK_COMMIT=()             # key  -> commit
+typeset -gA PLUG_LOCK_BRANCH=()             # key  -> branch
+typeset -ga PLUG_EVAL_NAMES=()              # cached tool inits, in order
+typeset -gA PLUG_EVAL_CMDS=()               # name -> command
+
+typeset -gi PLUG_OMZ_READY=0
+typeset -gi PLUG_OMZ_LIBS=0
+typeset -gi PLUG_COMPINIT_DONE=0
+
+typeset -ga PLUG_PROF_NAMES=()
+typeset -ga PLUG_PROF_TIMES=()
+typeset -g  _plug_prof_t0=0
+typeset -gi _plug_color=0
+typeset -gi _plug_d_err=0
+typeset -gi _plug_d_warn=0
+
+
+# =============================================================================
+# Load the library (this file is only the entry point)
+# =============================================================================
+
+if [[ ! -d $PLUG_ROOT/lib ]]; then
+    print -u2 -r -- "plug.zsh: lib/ not found next to plug.zsh (expected: $PLUG_ROOT/lib)"
+    print -u2 -r -- "          Keep the whole plug.zsh repository, not just the single file."
+    return 1
 fi
 
-# Expose dispatcher for interactive use (must come after lib/ load).
-plug() { command plug "$@" }
+for _plug_lib in "$PLUG_ROOT"/lib/*.zsh(N); do
+    source "$_plug_lib"
+done
+unset _plug_lib
+
+
+# =============================================================================
+# Startup
+# =============================================================================
+#
+# Fast path: a handful of `-nt` tests and one `source`. This runs at the top
+# level of your .zshrc, so plugins are sourced exactly as if you had written
+# the `source` lines yourself. gum is NOT needed here.
+
+if [[ -z $PLUG_NO_AUTOLOAD ]]; then
+    _plug_cache_ok || _plug_build_cache >/dev/null 2>&1
+    [[ -r $PLUG_CACHE_FILE ]] && source "$PLUG_CACHE_FILE"
+fi

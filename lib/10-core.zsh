@@ -27,7 +27,7 @@ _plug_norm() {
             REPLY=$n
             return 0
             ;;
-        /*|./*|../*|'~'|'~/')
+        /*|./*|../*|'~'|'~/'*)
             n=${n/#\~/$HOME}
             REPLY="local:${n:A}"
             return 0

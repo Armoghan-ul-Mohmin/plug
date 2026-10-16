@@ -76,6 +76,9 @@ typeset -g PLUG_LOCK_FILE="$PLUG_DIR/lock"
 typeset -g PLUG_CACHE_FILE="$PLUG_DIR/cache.zsh"
 typeset -g PLUG_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/plug"
 
+emulate -L zsh
+setopt extended_glob
+
 # Source modules in numeric order.
 local f
 for f in "$PLUG_ROOT"/lib/*.zsh(N); do
@@ -86,3 +89,6 @@ done
 if [[ -r $PLUG_CACHE_FILE && $PLUG_CACHE_FILE -nt $PLUG_PLUGIN_FILE ]]; then
     source "$PLUG_CACHE_FILE"
 fi
+
+# Expose dispatcher for interactive use (must come after lib/ load).
+plug() { command plug "$@" }

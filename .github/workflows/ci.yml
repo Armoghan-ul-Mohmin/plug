@@ -37,6 +37,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gum
 
+      - name: Install Zsh (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y zsh
+
       - name: Install gum (macOS)
         if: runner.os == 'macOS'
         run: brew install gum

@@ -38,6 +38,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Zsh (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
       - name: Check every zsh file parses
         run: |
           set -e

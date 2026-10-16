@@ -19,7 +19,6 @@ New here? The [README](../README.md) gives the overview and quick start. The
 
 ```zsh
 # install
-git clone https://github.com/Armoghan-ul-Mohmin/plug.git ~/.config/zsh/plug
 echo 'source ~/.config/zsh/plug/plug.zsh' >> ~/.zshrc
 exec zsh
 

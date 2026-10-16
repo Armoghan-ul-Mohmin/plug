@@ -21,7 +21,6 @@ Be kind and constructive. Assume good faith. This project follows the spirit of 
 1. Fork and clone the repository:
 
    ```zsh
-   git clone https://github.com/<you>/plug.git
    cd plug
    ```
 

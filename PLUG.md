@@ -71,7 +71,6 @@ Clone the repository somewhere permanent (keep the whole repository — `lib/` m
 `plug.zsh`):
 
 ```zsh
-git clone https://github.com/Armoghan-ul-Mohmin/plug.git ~/.config/zsh/plug
 ```
 
 Source it from `~/.zshrc`, **before** your own `compinit`:

@@ -51,7 +51,6 @@ go install github.com/charmbracelet/gum@latest
 `lib/` must sit next to `plug.zsh`, so clone the whole repository (do not copy a single file):
 
 ```zsh
-git clone https://github.com/Armoghan-ul-Mohmin/plug.git ~/.config/zsh/plug
 ```
 
 ### Via a plugin manager

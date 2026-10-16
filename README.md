@@ -2,228 +2,254 @@
 
 # plug.zsh
 
-**A fast, small, modular Zsh plugin manager with a beautiful [Gum](https://github.com/charmbracelet/gum) interface.**
+**A fast, modular, and beautiful Zsh plugin manager powered by [Gum](https://github.com/charmbracelet/gum).**
 
-Install GitHub plugins, Oh My Zsh plugins and your own files · lazy & turbo loading ·
-parallel updates · lockfiles · startup profiling · one tiny startup cache.
+Install GitHub plugins, Oh My Zsh plugins, and your own local files with minimal shell startup overhead. Features lazy & turbo (deferred) loading, parallel updates, reproducible lockfiles, startup profiling, and a single-line startup cache.
 
 [![Version](https://img.shields.io/badge/version-1.0.0-8a5cf6)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3fb950)](LICENSE)
 [![zsh 5.3+](https://img.shields.io/badge/zsh-5.3%2B-4e9a06)](#requirements)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS-58a6ff)](#requirements)
 
-[Quick start](#quick-start) ·
-[Install](#installation) ·
+[Quick Start](#quick-start) ·
+[Installation](#installation) ·
+[Usage](#usage) ·
+[Architecture](#architecture) ·
 [Docs](docs/index.md) ·
-[Commands](docs/commands.md) ·
-[Comparison](#how-it-compares) ·
-[Troubleshooting](docs/troubleshooting.md)
+[Contributing](#contributing) ·
+[Testing](#testing)
 
 </div>
 
 ---
 
-`plug.zsh` keeps your shell start-up fast by compiling everything you load into a single,
-literal `source` cache. On the hot path it does nothing but a handful of `-nt` file-time
-comparisons and one `source` — no parsing, no git, no Gum, no subprocesses. Managing plugins is a
-pleasure: every command has a clean, colourised output and an interactive Gum menu.
+## Why plug.zsh?
 
-> **A note on the version number.** This is the **first public release (1.0.0)**, but it is really
-> the *second* generation of plug.zsh: an earlier, hand-written single-file version was never
-> finished or published. The current module-and-test rewrite was developed with heavy AI
-> assistance. Full story and AI disclosure: **[docs/history.md](docs/history.md)**.
+`plug.zsh` is built for speed and clarity. During shell startup, the hot path does only a few `-nt` checks and a **single literal `source`** of the generated cache — no parsing, no `git`, no `gum`, no subprocesses, and no globbing of plugin files. Management commands are interactive and elegant via Gum, yet your shell starts perfectly without it.
 
-```console
-$ plug install zsh-users/zsh-autosuggestions Aloxaf/fzf-tab
-$ plug lazy Aloxaf/fzf-tab fzf
-$ plug defer zsh-users/zsh-autosuggestions 500
-$ plug status
+```mermaid
+flowchart TD
+  A["~/.zshrc sources plug.zsh"] --> B{PLUG_LOADED_SELF?}
+  B -- no --> C["Set defaults & derive paths"]
+  C --> D["Source lib/*.zsh in order"]
+  D --> E{cache.zsh exists & fresh?}
+  E -- yes --> F["source cache.zsh (fast path)"]
+  E -- no --> G["(cache built on demand)"]
+  B -- yes --> H["No-op (idempotent)"]
 ```
 
-## Highlights
+---
 
-- **GitHub plugins** — `plug install user/repo`, or pin a branch with `user/repo@branch`.
-- **Oh My Zsh plugins** — `plug install omz git docker sudo`. The `omz` shorthand works
-  *anywhere* in the argument list.
-- **Your own files** — `plug add ~/dotfiles/aliases.zsh` sources a file, or adds a directory to
-  `fpath` and sources every `*.zsh` inside it.
-- **Lazy loading** — `plug lazy Aloxaf/fzf-tab fzf` loads a plugin on first use of a command.
-- **Turbo (deferred) loading** — `plug defer user/repo 500` loads a plugin *after* your first
-  prompt, so it never delays it. (This is zinit's `wait`.)
-- **Parallel updates** — `plug update` fetches everything `PLUG_JOBS` at a time (default 4).
-- **Lockfile** — `plug lock` records exact commits, `plug sync` restores them for reproducible
-  setups across machines.
-- **Cached tool inits** — `plug eval add zoxide zoxide init zsh` stops paying for
-  `$(zoxide init zsh)` on every shell.
-- **Completions** — install your own (`plug completion add ./_mytool`) or generate them from a
-  command (`plug completion gen kubectl kubectl completion zsh`).
-- **Diagnostics** — `plug status`, `plug list`, `plug doctor`, `plug profile`, `plug info`.
-- **Beautiful, safe UI** — icons + colour when you have a TTY, clean tab-separated output when you
-  pipe it, and a graceful fallback everywhere else.
-- **Modular source** — a small loader plus ten focused modules under [`lib/`](lib/). Easy to read,
-  easy to hack.
+## Features
+
+- **GitHub Plugins** — `plug install user/repo` with optional `@branch` pinning.
+- **Oh My Zsh Plugins** — `plug install omz <plugin...>`. The `omz` shorthand works anywhere in args.
+- **Local Files/Dirs** — `plug add ~/aliases.zsh` sources a file; `plug add ~/lib/` adds to `fpath` and sources `*.zsh`.
+- **Lazy Loading** — Load on first command use: `plug lazy <plugin> <cmd1> <cmd2>...`
+- **Turbo/Deferred Loading** — Load after first prompt with delay (ms): `plug defer <plugin> <delay>`
+- **Parallel Updates** — `plug update` fetches with configurable `PLUG_JOBS` (default 4).
+- **Reproducible Lockfiles** — `plug lock` records exact commits; `plug sync` restores them.
+- **Cached Tool Inits** — `plug eval add <tool> '<cmd>'` caches init output and sources it.
+- **Managed Completions** — `plug completion add <file>` or `plug completion gen <cmd> '<gen-cmd>'`.
+- **Health & Profiling** — `plug status`, `plug doctor`, `plug profile`, `plug info`, `plug logs`.
+- **Offline & Sandboxable** — Fully testable without network access or touching real `$HOME`.
+- **Graceful UX** — TTY gets colors/icons; piped/non-TTY gets plain tab-separated output; Gum optional.
+
+---
 
 ## Requirements
 
-| Requirement | Why |
-|---|---|
-| `zsh` 5.3+ | The manager is written in Zsh |
-| `git` | Clone, update and lock plugins (2.25+ for Oh My Zsh sparse checkout) |
-| [`gum`](https://github.com/charmbracelet/gum) | The interactive `plug` command (not needed to *start* your shell) |
-| A Nerd Font | Optional; recommended for the icons |
+- **zsh** 5.3+ (Linux/macOS)
+- **git** (2.25+ recommended for OMZ sparse checkout)
+- **[gum](https://github.com/charmbracelet/gum)** — required only for management commands (shell starts without it)
+- **Nerd Font** (optional) for icons
 
-Your shell **starts fine without Gum**. Gum is only needed when you run a `plug` management
-command.
+---
 
 ## Installation
 
-Clone the whole repository somewhere permanent — `lib/` must sit next to `plug.zsh`:
-
+### 1) Clone the repo
 ```zsh
-git clone https://github.com/Armoghan-ul-Mohmin/plug.git ~/.config/zsh/plug
+# Choose a permanent location (lib/ must be next to plug.zsh)
 ```
 
-Source it from `~/.zshrc`, **before** any `compinit` you run yourself:
-
+### 2) Source in .zshrc (before compinit)
 ```zsh
+# Add to your ~/.zshrc
 source ~/.config/zsh/plug/plug.zsh
 ```
 
-Reload, then check everything is happy:
-
+### 3) Load & verify
 ```zsh
 exec zsh
 plug doctor
 ```
 
-> Sourcing the same `plug.zsh` twice in one shell is a safe no-op.
+Sourcing twice is a safe no-op (`PLUG_LOADED_SELF` guard). For more options (manual, package managers), see [docs/installing.md](docs/installing.md).
 
-See [docs/installing.md](docs/installing.md) for package-manager notes, a manual install, and
-first-run tips.
+---
 
-## Quick start
+## Quick Start
 
 ```zsh
-# GitHub plugins
+# Install GitHub plugins
 plug install zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting
 
-# Pin a branch
+# Pin a specific branch
 plug install zdharma-continuum/fast-syntax-highlighting@master
 
-# Oh My Zsh plugins — `omz` can appear anywhere in the list
+# Install Oh My Zsh plugins (omz can appear anywhere)
 plug install omz git docker sudo
-plug install user2/foo omz git          # -> user2/foo and omz:git
+plug install user/foo omz fzf-tab
 
-# Lazy + turbo loading
-plug lazy Aloxaf/fzf-tab fzf            # load when `fzf` is first used
-plug defer zsh-users/zsh-autosuggestions 500   # load ~500ms after the first prompt
+# Lazy load when a command is first used
+plug lazy Aloxaf/fzf-tab fzf
 
-# Pick plugins interactively
-plug browse        # curated popular GitHub plugins
-plug omz           # every plugin in your Oh My Zsh checkout
+# Defer loading after first prompt (~500ms)
+plug defer zsh-users/zsh-autosuggestions 500
 
-# Cache a slow tool initialiser
-plug eval add zoxide zoxide init zsh
-
-exec zsh           # apply changes
+# Check status
+plug status
 ```
 
-Then explore:
+Apply changes with `exec zsh` after adding lazy/defer/eval/completions.
 
+---
+
+## Usage
+
+### Core Commands
 ```zsh
-plug status        # dashboard: states, commits, cache, lock drift
-plug help          # the built-in command reference
+plug list                # List plugins (tab-separated when piped)
+plug status              # Dashboard with states, commits, cache, lock drift
+plug install <args>      # Install GH/OMZ plugins; omz shorthand supported
+plug add <path>          # Source file or add dir to fpath + source *.zsh
+plug remove <name>       # Remove plugin (safe; add'd files/dirs not auto-removed)
+plug enable/disable      # Toggle plugins
+plug lazy <plug> <cmds>  # Lazy-load on first command use
+plug defer <plug> <ms>   # Turbo/deferred load after first prompt
+plug source <plug>       # Force source a plugin
+plug update              # Parallel update (PLUG_JOBS)
+plug outdated            # Show plugins with upstream changes
+plug lock                # Record exact commits
+plug sync                # Restore from lockfile
+plug reload              # Rebuild cache & reload
+plug doctor              # Health check
+plug profile             # Startup timing
+plug help                # Built-in help
+plug menu                # Interactive Gum menu
+plug browse              # Curated catalog
+plug omz                 # Browse OMZ checkout
 ```
 
-## How it compares
-
-| | **plug.zsh** | zinit | znap | antigen | antibody | oh-my-zsh |
-|---|---|---|---|---|---|---|
-| Single small install | ✅ modular, no build | ⚠️ large | ✅ | ❌ | ⚠️ Go binary | ❌ big |
-| Startup cache | ✅ literal `source` | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Lazy loading | ✅ | ✅ | ✅ | ⚠️ | ✅ | ❌ |
-| Turbo / deferred load | ✅ `defer` | ✅ `wait` | ⚠️ | ❌ | ❌ | ❌ |
-| Parallel updates | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Lockfile | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| Oh My Zsh plugins | ✅ built in | ✅ | ✅ | ✅ | ✅ | — |
-| Cached tool inits | ✅ `eval` | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ |
-| Health check & profiler | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| Friendly Gum UI | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
-
-A fuller discussion lives in [docs/comparison.md](docs/comparison.md), and
-[docs/migration.md](docs/migration.md) shows how to move over from each manager.
-
-## Documentation
-
-| Document | What's inside |
-|---|---|
-| [PLUG.md](PLUG.md) | **The complete manual** — every command, setting, and internal |
-| [docs/installing.md](docs/installing.md) | Requirements, installation, first run |
-| [docs/commands.md](docs/commands.md) | Every command and subcommand with examples |
-| [docs/configuration.md](docs/configuration.md) | Every `PLUG_*` variable, explained |
-| [docs/architecture.md](docs/architecture.md) | Modules, the startup cache, lazy/defer internals |
-| [docs/migration.md](docs/migration.md) | Migrate from Oh My Zsh, zinit, znap, antigen, antibody |
-| [docs/comparison.md](docs/comparison.md) | Detailed comparison with other managers |
-| [docs/troubleshooting.md](docs/troubleshooting.md) | Symptoms, causes, and fixes |
-| [docs/faq.md](docs/faq.md) | Frequently asked questions |
-| [docs/history.md](docs/history.md) | Project history, versioning, and AI disclosure |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Development setup and how to run the tests |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
-
-## Project layout
-
-```text
-plug.zsh              entry point (configuration + startup)
-lib/
-  00-util.zsh         palette, icons, output, logging
-  10-core.zsh         names, paths, registry storage, lock access
-  20-git.zsh          git plumbing, clone, OMZ checkout, update/sync scripts
-  30-cache.zsh        compinit, OMZ environment, startup cache, lazy/defer
-  40-plugins.zsh      install, add, remove, enable/disable, lazy, defer, source, browse
-  45-tools.zsh        cached tool inits (`eval`) and completions
-  50-update.zsh       update, outdated, lock, sync, reinstall, clean, selfupdate
-  60-inspect.zsh      list, status, info, profile, logs, cache, edit, doctor
-  90-ui.zsh           the `plug` dispatcher, interactive menu, help
- docs/                 documentation
- test/run-tests.zsh    offline, sandboxed end-to-end test suite
- test/lib/             test framework and sandbox fixtures
- test/cases/           one test file per feature
+### Tools & Completions
+```zsh
+plug eval add zoxide 'zoxide init zsh'
+plug eval list/remove/refresh
+plug completion add ./_mytool
+plug completion gen kubectl 'kubectl completion zsh'
+plug completion list/remove
 ```
+
+Full reference: [docs/commands.md](docs/commands.md), [PLUG.md](PLUG.md).
+
+---
+
+## Architecture
+
+plug.zsh is modular and cache-driven for minimal startup cost.
+
+```mermaid
+graph LR
+  L[plug.zsh loader] --> U[00-util: output/logging]
+  L --> C[10-core: names/paths/registry/lock]
+  L --> G[20-git: clone/update/OMZ]
+  L --> K[30-cache: compinit/OMZ env/cache/lazy-defer]
+  L --> P[40-plugins: lifecycle]
+  L --> T[45-tools: eval/completions]
+  L --> M[50-update: update/lock/sync/clean/selfupdate]
+  L --> I[60-inspect: status/profile/doctor]
+  L --> UI[90-ui: dispatcher/menu/help]
+  K -->|generates| CACHE[cache.zsh: literal source lines]
+```
+
+- **Startup fast path:** only `-nt` checks + single `source cache.zsh`. No git/gum/parsing/globbing.
+- **Public on-disk state:** `plugins.txt`, `disabled.txt`, `lazy.txt`, `deferred.txt`, `branches.txt`, `evals.txt`, `lock` (`name|branch|commit`), `cache.zsh` under `PLUG_DIR`.
+- **Idempotent:** guarded by `PLUG_LOADED_SELF`; `PLUG_DIR` preserved if exported.
+- **Details:** [docs/architecture.md](docs/architecture.md), [docs/configuration.md](docs/configuration.md).
+
+---
+
+## Development
+
+
+**Key conventions:**
+- Pure Zsh, 4 spaces, no tabs, `name() { }` (no `function`), prefer `${…}`, `emulate -L zsh` for stateful; comments explain *why*.
+- `GIT_TERMINAL_PROMPT=0` for all git ops; no secrets logged.
+- Destructive commands confirm unless `-y/--yes`.
+- Only `list|ls|--version|-v|version|help|h|info|about` work without gum.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full dev setup, style, and adding tests.
+
+---
 
 ## Testing
 
-The test suite runs entirely offline in a throwaway sandbox (local bare git remotes, a fake Oh
-My Zsh, an isolated `$HOME`):
+Tests run **entirely offline** in an isolated sandbox (local bare git remotes + fake OMZ; isolated `$HOME`/`ZDOTDIR`).
 
 ```zsh
-zsh test/run-tests.zsh          # run everything
-zsh test/run-tests.zsh --list   # list cases
+# Run all tests
+zsh test/run-tests.zsh
+
+# List cases
+zsh test/run-tests.zsh --list
+
+# Filter by name/number
+zsh test/run-tests.zsh install lazy
 ```
 
-It exercises every command and subcommand, including lazy/defer firing, lock/sync drift, eval
-caching, and graceful non-TTY behaviour. Tests are one file per feature under `test/cases/`; see
-[test/README.md](test/README.md) for the helper reference. CI runs the suite on every push and
-pull request.
+- 17 ordered, stateful cases covering all features.
+- Must pass: **96 passed, 0 failed**.
+- Syntax check: `for f in plug.zsh lib/*.zsh test/run-tests.zsh test/lib/*.zsh test/cases/*.zsh; do zsh -n "$f" || exit 1; done`
+- YAML check: `python3 -c 'import yaml,glob; [yaml.safe_load(open(p)) for p in glob.glob(".github/**/*.yml",recursive=True)]'`
 
-## History & how it was built
+CI runs on Linux/macOS. See [test/README.md](test/README.md).
 
-This is the **second generation** of plug.zsh, published as version **1.0.0**. The first
-generation was hand-written as one large file, grew messy, had bugs, and was never finished or
-published — so there is no public v1 to be compatible with, and the first releasable version is
-simply numbered 1.0.0. This generation was rewritten from scratch with heavy **AI assistance**
-("vibe coded"), then reviewed and covered by tests.
+---
 
-That is disclosed openly, and it is why the project leans hard on its test suite: every command is
-exercised end-to-end against local git remotes and a fake Oh My Zsh before release. AI tools are
-welcome in contributions too — the only requirement is that `zsh test/run-tests.zsh` passes. Read
-the full story in [docs/history.md](docs/history.md).
+## Docs
+
+| Doc | Purpose |
+|---|---|
+| [PLUG.md](PLUG.md) | Complete manual (commands, settings, internals) |
+| [docs/index.md](docs/index.md) | Documentation TOC |
+| [docs/installing.md](docs/installing.md) | Install/upgrade/first run |
+| [docs/commands.md](docs/commands.md) | Full command reference with examples |
+| [docs/configuration.md](docs/configuration.md) | All PLUG_* variables |
+| [docs/architecture.md](docs/architecture.md) | Modules, cache, lazy/defer |
+| [docs/migration.md](docs/migration.md) | Migrate from OMZ/zinit/znap/antigen/antibody |
+| [docs/comparison.md](docs/comparison.md) | Feature comparison |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | Troubleshooting guide |
+| [docs/faq.md](docs/faq.md) | FAQs |
+| [docs/history.md](docs/history.md) | History & AI disclosure |
+
+---
+
+## History & AI Disclosure
+
+This is **plug.zsh v1.0.0** (second generation). The first single-file version was never finished/published; this rewrite was developed with **heavy AI assistance**, then reviewed and end-to-end tested. Every command is covered by the sandboxed test suite to ensure correctness. See [docs/history.md](docs/history.md) for the full story.
+
+---
 
 ## Contributing
 
-Bug reports, feature requests and pull requests are welcome — see
-[CONTRIBUTING.md](CONTRIBUTING.md). Please run `zsh -n` on changed files and the test suite before
-opening a PR.
+Bug reports, features, and PRs welcome. Before opening a PR:
+1. `zsh -n` on changed files
+2. `zsh test/run-tests.zsh` — must pass (96/0)
+3. Follow style (4 spaces, `name() { }`, explain *why*, no secrets)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © Armoghan-ul-Mohmin
+[MIT](LICENSE) © 2026 Armoghan-ul-Mohmin

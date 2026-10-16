@@ -1,0 +1,78 @@
+# File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,linux
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux
+
+# Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+
+# ---------- Claude Code ----------
+.claude/settings.local.json
+.claude/*.log
+
+# ---------- OpenCode ----------
+.opencode/*.log
+
+# ---------- Shell scratch ----------
+# Plugin data is stored outside the repo by default; ignore it if someone
+# points PLUG_DIR at the checkout.
+.cache/
+cache.zsh
+cache.zsh.tmp.*
+plug.log
+plug.log.old
+plugins/
+omz/
+evals/
+completions/
+plugins.txt
+disabled.txt
+lazy.txt
+deferred.txt
+branches.txt
+evals.txt
+lock
+
+# ---------- Test sandbox ----------
+test/tmp/
+/tmp/
+
+# ---------- Misc ----------
+*.tmp
+*.bak
+*.orig
+*.rej

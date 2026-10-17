@@ -4,7 +4,7 @@ t_register case_dispatch "version, help, dispatch"
 
 case_dispatch() {
     run 'plug --version'
-    want 'plug 1.0.0' 'plug --version prints the version'
+    want 'plug 1.0.1' 'plug --version prints the version'
 
     run 'plug help'
     want 'OMZ shorthand' 'help renders'

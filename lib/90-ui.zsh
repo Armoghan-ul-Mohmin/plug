@@ -42,6 +42,7 @@ _plug_omz_expand() {
 plug() {
     emulate -L zsh
     _plug_color_init
+    _plug_force=0
 
     local cmd=${1:-menu}
     (( $# )) && shift
@@ -56,7 +57,14 @@ plug() {
 
         install|i)        _plug_need gum && plug_install "$@" ;;
         browse)           _plug_need gum && plug_browse ;;
-        omz)              _plug_need gum && plug_omz_browse ;;
+        omz)
+            _plug_need gum
+            if (( $# )); then
+                plug_install "omz:${^@}"
+            else
+                plug_omz_browse
+            fi
+            ;;
 
         add|a)            _plug_need gum && plug_add "$@" ;;
         remove|rm|uninstall)
@@ -71,7 +79,7 @@ plug() {
 
         update|up|upgrade)
                           _plug_need gum && plug_update "$@" ;;
-        outdated)         _plug_need gum && plug_outdated ;;
+        outdated)         _plug_need gum && _plug_force=1 && plug_outdated ;;
         lock)             _plug_need gum && plug_lock ;;
         sync)             _plug_need gum && plug_sync ;;
         reinstall)        _plug_need gum && plug_reinstall "$@" ;;
@@ -82,15 +90,15 @@ plug() {
         eval|ev)          _plug_need gum && plug_eval "$@" ;;
         completion|comp)  _plug_need gum && plug_completion "$@" ;;
 
-        status|st)        _plug_need gum && plug_status ;;
-        info|about)       plug_info ;;
+        status|st)        _plug_need gum && _plug_force=1 && plug_status ;;
+        info|about)       _plug_force=1; plug_info ;;
         list|ls)          plug_list ;;
-        doctor|dr)        _plug_need gum && plug_doctor ;;
-        profile)          plug_profile ;;
+        doctor|dr)        _plug_need gum && _plug_force=1 && plug_doctor ;;
+        profile)          _plug_force=1; plug_profile ;;
 
         edit)             _plug_need gum && plug_edit "$@" ;;
-        logs|log)         _plug_need gum && plug_logs "$@" ;;
-        cache)            _plug_need gum && plug_cache "$@" ;;
+        logs|log)         _plug_need gum && _plug_force=1 && plug_logs "$@" ;;
+        cache)            _plug_need gum && _plug_force=1 && plug_cache "$@" ;;
 
         menu|m)           _plug_menu ;;
         reload|restart|exec)

@@ -64,8 +64,19 @@ _plug_c() {
 
 _plug_dim() { _plug_c "$PLUG_C_DIM" "$@" }
 
+# _plug_force counts active requests to show output regardless of PLUG_QUIET.
+# Read-only report commands (doctor, status, list, …) set it so that silencing
+# .zshrc chatter never hides diagnostics a user asked for interactively.
+typeset -gi _plug_force=0
+
 _plug_say() {
     local code=$1 icon=$2; shift 2
+    # Suppress ok/info when quiet; keep warn/err
+    if (( PLUG_QUIET && ! _plug_force )); then
+        case $icon in
+            "$PLUG_ICON_OK"|"$PLUG_ICON_INFO") return 0 ;;
+        esac
+    fi
     print -r -- "$(_plug_c "1;$code" "$icon")  $*"
 }
 

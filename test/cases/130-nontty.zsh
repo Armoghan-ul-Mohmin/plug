@@ -14,5 +14,5 @@ case_nontty() {
     want 'plug' 'help pipes cleanly'
 
     run 'plug --version | cat'
-    want '1.0.0' 'version pipes cleanly'
+    want '1.0.1' 'version pipes cleanly'
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 # =============================================================================
-#  plug.zsh — fast, beautiful, modular Zsh plugin manager              v1.0.0
+#  plug.zsh — fast, beautiful, modular Zsh plugin manager              v1.0.1
 # =============================================================================
 #
 #  Usage (in ~/.zshrc, BEFORE any compinit of your own):
@@ -33,6 +33,7 @@
 #    PLUG_OMZ_LIB        OMZ lib files       (functions git clipboard)
 #    PLUG_MAX_LOG_SIZE   log rotation size   (1048576)
 #    PLUG_NO_AUTOLOAD    non-empty = only define functions, load nothing
+#    PLUG_QUIET           1 = suppress info/ok messages
 #
 #  Requirements: zsh 5.3+, git (2.25+ for Oh My Zsh), gum (for the plug command;
 #  your shell still starts fine without it, plugins load from the cache).
@@ -43,7 +44,7 @@
 # Configuration  (all values respect anything you exported before sourcing)
 # =============================================================================
 
-typeset -g PLUG_VERSION="1.0.0"
+typeset -g PLUG_VERSION="1.0.1"
 typeset -g PLUG_SELF="${${(%):-%x}:A}"
 typeset -g PLUG_ROOT="${PLUG_SELF:h}"
 
@@ -85,6 +86,7 @@ typeset -g PLUG_CACHE_DIR PLUG_GIT_BASE PLUG_OMZ_URL PLUG_OMZ_CACHE_DIR PLUG_OMZ
 : ${PLUG_JOBS:=4}
 : ${PLUG_MAX_LOG_SIZE:=1048576}
 : ${PLUG_PROFILE:=0}
+: ${PLUG_QUIET:=0}
 typeset -gi PLUG_COMPINIT PLUG_JOBS PLUG_MAX_LOG_SIZE PLUG_PROFILE
 
 typeset -ga PLUG_BROWSE_ITEMS=(

@@ -5,7 +5,22 @@ All notable changes to **plug.zsh** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.1] - 2026-10-17
+
+### Added
+
+- `PLUG_QUIET` setting: when set to `1`, suppresses informational and success messages so a
+  `.zshrc` full of `plug` calls stays tidy.
+
+### Fixed
+
+- `plug omz <plugins...>` now installs the named Oh My Zsh plugins (matching the `install`
+  shorthand) instead of always opening the interactive browser. Bare `plug omz` still browses.
+- `PLUG_QUIET=1` suppresses only info/ok messages; warnings and errors remain visible so genuine
+  problems are never hidden.
+- `PLUG_QUIET=1` no longer silences read-only report commands. `plug doctor`, `status`, `info`,
+  `profile`, `logs`, `cache` and `outdated` always print their output, so asking for diagnostics
+  interactively still works while `.zshrc` chatter stays quiet.
 
 ## [1.0.0] - 2026-10-16
 
@@ -62,5 +77,6 @@ plugin manager.
 - All git operations force `GIT_TERMINAL_PROMPT=0`, so commands never hang waiting for
   credentials and never echo them into the log.
 
-[Unreleased]: https://github.com/Armoghan-ul-Mohmin/plug/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Armoghan-ul-Mohmin/plug/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/Armoghan-ul-Mohmin/plug/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Armoghan-ul-Mohmin/plug/releases/tag/v1.0.0

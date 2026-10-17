@@ -1,7 +1,7 @@
 <h1 align='center'>plug.zsh</h1>
 
 <p align='center'>
-  <strong>v1.0.0</strong> — a fast, small, modular Zsh plugin manager with a beautiful
+  <strong>v1.0.1</strong> — a fast, small, modular Zsh plugin manager with a beautiful
   <a href="https://github.com/charmbracelet/gum">Gum</a> interface.<br>
   <a href="README.md">README</a> ·
   <a href="docs/installing.md">Install</a> ·
@@ -22,10 +22,10 @@ them from a generated startup cache so your shell opens instantly. It aims to be
 (deferred) loading, lockfiles, parallel updates — while staying readable, dependency-light, and
 pleasant to use.
 
-> **Version note.** **v1.0.0** is the first *public* release, but it is the second generation of
-> the project: an earlier hand-written single-file version was never finished or published. This
-> generation was rewritten with heavy AI assistance. See [docs/history.md](docs/history.md) for
-> the full story and the AI disclosure.
+> **Version note.** **v1.0.1** is the current release; the first *public* release, **v1.0.0**, was
+> the second generation of the project: an earlier hand-written single-file version was never
+> finished or published. This generation was rewritten with heavy AI assistance. See
+> [docs/history.md](docs/history.md) for the full story and the AI disclosure.
 
 ```console
 $ plug install zsh-users/zsh-autosuggestions Aloxaf/fzf-tab
@@ -271,6 +271,7 @@ PLUG_COMPINIT=1                        # run compinit when completions are neede
 PLUG_OMZ_LIB="functions git clipboard" # OMZ lib files to load
 PLUG_MAX_LOG_SIZE=1048576              # log rotation threshold (bytes)
 PLUG_PROFILE=0                         # set 1 to collect profiling data
+PLUG_QUIET=0                            # set 1 to silence info/ok chatter (warn/err/report still print)
 PLUG_GIT_BASE="https://github.com"     # where user/repo is cloned from
 PLUG_OMZ_URL="https://github.com/ohmyzsh/ohmyzsh.git"
 

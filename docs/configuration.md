@@ -64,6 +64,7 @@ different directory).
 | Variable | Default | Purpose |
 |---|---|---|
 | `PLUG_GIT_BASE` | `https://github.com` | Base URL that `user/repo` is cloned from |
+| `PLUG_QUIET` | `0` | Set to `1` to suppress info/ok messages (warnings, errors and report commands still print) |
 | `PLUG_OMZ_URL` | `https://github.com/ohmyzsh/ohmyzsh.git` | Oh My Zsh repository URL |
 | `PLUG_BROWSE_ITEMS` | a curated list | Entries shown by `plug browse` (`name|description`) |
 

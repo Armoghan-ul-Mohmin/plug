@@ -6,7 +6,7 @@
 
 Install GitHub plugins, Oh My Zsh plugins, and your own local files with minimal shell startup overhead. Features lazy & turbo (deferred) loading, parallel updates, reproducible lockfiles, startup profiling, and a single-line startup cache.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-8a5cf6)](#)
+[![Version](https://img.shields.io/badge/version-1.0.1-8a5cf6)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3fb950)](LICENSE)
 [![zsh 5.3+](https://img.shields.io/badge/zsh-5.3%2B-4e9a06)](#requirements)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS-58a6ff)](#requirements)
@@ -240,7 +240,7 @@ CI runs on Linux/macOS. See [test/README.md](test/README.md).
 
 ## History & AI Disclosure
 
-This is **plug.zsh v1.0.0** (second generation). The first single-file version was never finished/published; this rewrite was developed with **heavy AI assistance**, then reviewed and end-to-end tested. Every command is covered by the sandboxed test suite to ensure correctness. See [docs/history.md](docs/history.md) for the full story.
+This is **plug.zsh v1.0.1** (second generation, first public line is v1.0.0). The first single-file version was never finished/published; this rewrite was developed with **heavy AI assistance**, then reviewed and end-to-end tested. Every command is covered by the sandboxed test suite to ensure correctness. See [docs/history.md](docs/history.md) for the full story.
 
 ---
 

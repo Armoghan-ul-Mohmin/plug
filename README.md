@@ -68,26 +68,29 @@ flowchart TD
 
 ## Installation
 
-### 1) Clone the repo
+### Recommended: Auto-install (no manual clone needed)
+
+Add this to your `~/.zshrc` **before** any `compinit`:
+
 ```zsh
-# Choose a permanent location (lib/ must be next to plug.zsh)
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
 ```
 
-### 2) Source in .zshrc (before compinit)
-```zsh
-# Add to your ~/.zshrc
-source ~/.config/zsh/plug/plug.zsh
-```
+Reload your shell:
 
-### 3) Load & verify
 ```zsh
 exec zsh
 plug doctor
 ```
 
-Sourcing twice is a safe no-op (`PLUG_LOADED_SELF` guard). For more options (manual, package managers), see [docs/installing.md](docs/installing.md).
+This automatically clones plug.zsh if missing and keeps `lib/` next to `plug.zsh`. Sourcing twice is a safe no-op (`PLUG_LOADED_SELF` guard). For manual/package manager options, see [docs/installing.md](docs/installing.md).
 
 ---
+
 
 ## Quick Start
 

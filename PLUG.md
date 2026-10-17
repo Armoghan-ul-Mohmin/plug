@@ -67,16 +67,14 @@ Installing or browsing Oh My Zsh needs **git 2.25+** for sparse checkout.
 
 ## Installation
 
-Clone the repository somewhere permanent (keep the whole repository — `lib/` must sit next to
-`plug.zsh`):
+Add to your `~/.zshrc` **before** your own `compinit` (auto-installs if missing):
 
 ```zsh
-```
-
-Source it from `~/.zshrc`, **before** your own `compinit`:
-
-```zsh
-source ~/.config/zsh/plug/plug.zsh
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
 ```
 
 Then reload and check:
@@ -276,7 +274,11 @@ PLUG_PROFILE=0                         # set 1 to collect profiling data
 PLUG_GIT_BASE="https://github.com"     # where user/repo is cloned from
 PLUG_OMZ_URL="https://github.com/ohmyzsh/ohmyzsh.git"
 
-source ~/.config/zsh/plug/plug.zsh
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
 ```
 
 | Variable | Default | Purpose |

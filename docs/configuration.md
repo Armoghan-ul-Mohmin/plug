@@ -10,7 +10,11 @@ PLUG_DIR="$HOME/.local/share/zsh"
 PLUG_JOBS=8
 PLUG_COMPINIT=1
 
-source ~/.config/zsh/plug/plug.zsh
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
 ```
 
 ---

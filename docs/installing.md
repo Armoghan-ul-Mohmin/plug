@@ -46,11 +46,23 @@ go install github.com/charmbracelet/gum@latest
 
 ## Install plug.zsh
 
-### Recommended: clone the repository
+### Recommended: Auto-install (no manual clone)
 
-`lib/` must sit next to `plug.zsh`, so clone the whole repository (do not copy a single file):
+Add this to your `~/.zshrc` **before** any `compinit`:
 
 ```zsh
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
+```
+
+Reload:
+
+```zsh
+exec zsh
+plug doctor
 ```
 
 ### Via a plugin manager
@@ -61,21 +73,25 @@ off the outer manager entirely.
 
 ### Manual
 
-Download the release tarball or clone anywhere; just keep `plug.zsh` and `lib/` together.
+Download the release tarball or clone anywhere; just keep `plug.zsh` and `lib/` together (then source that path).
 
 ---
 
 ## Wire it into `.zshrc`
 
-Source plug.zsh **before** any `compinit` you run yourself, so its completions are picked up:
+If you used the auto-install above, you're done. If you're using a custom path, source plug.zsh **before** any `compinit` you run yourself:
 
 ```zsh
 # ~/.zshrc
 
 # optional settings (see docs/configuration.md)
-PLUG_DIR="$HOME/.local/share/zsh"
+PLUG_DIR="${XDG_DATA_HOME:-${HOME}/.local/share}/zsh"
 
-source ~/.config/zsh/plug/plug.zsh
+PLUG_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/plug/plug.git"
+if [[ ! -d "$PLUG_HOME" ]]; then
+    git clone --depth=1 https://github.com/Armoghan-ul-Mohmin/plug.git "$PLUG_HOME"
+fi
+source "$PLUG_HOME/plug.zsh"
 
 # your own config continues here ...
 ```
